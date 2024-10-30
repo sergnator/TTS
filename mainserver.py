@@ -5,6 +5,7 @@ import speech_recognition as sr
 import wave
 import sys
 import pyaudio
+from speech_recognition import AudioData
 
 CHUNK = 1024
 FRT = pyaudio.paInt16
@@ -24,21 +25,13 @@ big_text = None
 def handle_message(message):
     global big_text
     frames.append(message["data"])
-    w = wave.open(OUTPUT, "wb")
-    w.setnchannels(CHAN)
-    w.setsampwidth(message["samples"])
-    w.setframerate(RT)
-    w.writeframes(b''.join(frames))
-    w.close()
-    audio_file = sr.AudioFile(OUTPUT)
     try:
-        with audio_file as source:
-            audio_data = recognizer.record(source)
+        audio_data = AudioData(b''.join(frames), RT , message["samples"])
 
-            text = recognizer.recognize_google(audio_data, language='ru-RU')
-            if text != big_text:
-                print(text)
-                big_text = text
+        text = recognizer.recognize_google(audio_data, language='ru-RU')
+        if text != big_text:
+            print(text)
+            big_text = text
     except:
         pass
 
