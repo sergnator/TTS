@@ -1,39 +1,36 @@
-from flask import Flask, render_template
-from flask_socketio import SocketIO, send
+from venv import logger
+
+from flask import Flask, render_template, session
+from flask_socketio import SocketIO, send, emit, disconnect
 
 import speech_recognition as sr
-import wave
-import sys
-import pyaudio
-from speech_recognition import AudioData
 
-CHUNK = 1024
-FRT = pyaudio.paInt16
-CHAN = 1
-RT = 44100
-REC_SEC = 5
-OUTPUT = "output1.wav"
 
-frames = []
+from flask import request
+
+
 app = Flask(__name__)
 app.config["SECRET_KEY!"] = "slava_jesusu"
 soketio = SocketIO(app)
-recognizer = sr.Recognizer()
-sr.LANGUAGE = 'ru-RU'
-big_text = None
+
+datas = {}
+
+
 @soketio.on("message")
 def handle_message(message):
-    global big_text
-    frames.append(message["data"])
-    try:
-        audio_data = AudioData(b''.join(frames), RT , message["samples"])
+    datas[request.sid]["speech"].append(message)
 
-        text = recognizer.recognize_google(audio_data, language='ru-RU')
-        if text != big_text:
-            print(text)
-            big_text = text
-    except:
-        pass
+@soketio.on("command")
+def handle_command(message):
+
+    emit("command_", b''.join(datas[request.sid]["speech"]))
+    disconnect()
+
+@soketio.on("connect") # в headers должны быть samples
+def connect():
+    datas[request.sid] = {"samples": int(request.headers["samples"]), "speech": []}
+
+
 
 
 
