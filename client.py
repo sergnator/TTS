@@ -8,13 +8,13 @@ p = pyaudio.PyAudio()
 client = socketio.Client()
 
 @client.on("command_")
-def do_command(data_):
+def do_command():
     print('afsgasg')
-    out.write(data_)
 
 
 
-client.connect("http://192.168.68.106:5000", headers={"samples": str(p.get_sample_size(FRT))})
+
+client.connect("http://192.168.68.104:5000", headers={"samples": str(p.get_sample_size(FRT))})
 
 out = p.open(format=FRT, channels=CHAN, rate=RT, output=True)
 
