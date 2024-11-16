@@ -14,7 +14,7 @@ def do_command():
 
 
 
-client.connect("http://192.168.68.104:5000", headers={"samples": str(p.get_sample_size(FRT))})
+client.connect("http://192.168.68.105:5000", headers={"samples": str(p.get_sample_size(FRT))})
 
 out = p.open(format=FRT, channels=CHAN, rate=RT, output=True)
 
