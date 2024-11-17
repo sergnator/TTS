@@ -7,13 +7,6 @@ p = pyaudio.PyAudio()
 
 client = socketio.Client()
 
-@client.on("command_")
-def do_command():
-    print('afsgasg')
-
-
-
-
 client.connect("http://192.168.68.104:5000", headers={"samples": str(p.get_sample_size(FRT))})
 
 out = p.open(format=FRT, channels=CHAN, rate=RT, output=True)
@@ -26,5 +19,5 @@ for i in range(0, int(RT / CHUNK * REC_SEC)):
 print("stop")
 stream.close()
 client.emit("command", "алёёёёёёёёёёёёёёёёёёёёёёёёёёёёёёёёёёёёёёёё")
-client.sleep(5)
 
+client.wait()

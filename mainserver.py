@@ -3,7 +3,8 @@ from flask_socketio import SocketIO, send, emit, disconnect
 
 from vosk import KaldiRecognizer, Model
 
-from constans import FRT
+
+from constans import FRT, RT
 import json
 from flask import request
 
@@ -22,14 +23,12 @@ def handle_message(message):
 
 @soketio.on("command")
 def handle_command(message):
-    offline_recognizer = KaldiRecognizer(model, FRT)
-    for el in datas[request.sid]["speech"]:
-        if offline_recognizer.AcceptWaveform(el):
-            text = json.loads(offline_recognizer.Result())["text"]
-            print(text)
-        else:
-            print(offline_recognizer.PartialResult())
-    datas[request.sid]["speech"] = []
+    offline_recognizer = KaldiRecognizer(model, RT)
+    offline_recognizer.AcceptWaveform(b''.join(datas[request.sid]["speech"]))
+    text = json.loads(offline_recognizer.Result())["text"]
+    print(text)
+    # обрабатываем текст и отправляем клиенту команду
+    disconnect(sid=request.sid)
 
 
 @soketio.on("connect")  # в headers должны быть samples
